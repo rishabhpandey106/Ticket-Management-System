@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Details</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/tickets">Ticket</a>
+        <a href="#signup">Signup</a>
+    </div>
+
+    <div class="ticket-details">
+        <h2>Ticket Details</h2>
+        <button class="close-button">Close</button>
+        <div class="details-section">
+            <span>Ticket ID: </span><span id="ticket-id">1234</span>
+            <h3 id="ticket-title">Ticket Title</h3>
+            <p id="ticket-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <span id="ticket-priority">high</span>
+        </div>
+        <div class="person-section">
+            <h3>Assigned Person</h3>
+            <p>Name: John Doe</p>
+            <p>Expertise: Technical Support</p>
+        </div>
+        <div class="chat-section">
+            <h3>Chat</h3>
+            <div class="chat-messages">
+                <div class="message">
+                    <span class="sender">John Doe:</span> Hi, how can I assist you?
+                </div>
+                <div class="message">
+                    <span class="sender">User:</span> I'm having trouble with my account.
+                </div>
+                <!-- More chat messages here -->
+            </div>
+            <div class="input-box">
+                <input type="text" placeholder="Type your message...">
+                <button class="send-button">Send</button>
+            </div>
+        </div>
+        <script src="/static/eachticket.js"></script>
+    </div>
+</body>
+</html>
