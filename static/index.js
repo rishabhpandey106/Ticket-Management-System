@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const titleInput = document.getElementById("title");
   const desc = document.getElementById("description");
   const priorityInput = document.getElementById("priority");
+  const departmentInput = document.getElementById("department");
   const ticketform = document.getElementById("ticket-form");
   const table = document.getElementById('ticket-table');
   const ticketid = document.getElementById("ticketid");
@@ -20,7 +21,10 @@ document.addEventListener("DOMContentLoaded", function() {
       const description = desc.value;
       const priority = priorityInput.value;
       const ticketID = ticketid.value;
-      console.log("Submitting data:", { ticketID, title, description, priority });
+      const department = departmentInput.value;
+      console.log("departent"  , department); // low
+      const assignedto = '';
+      console.log("Submitting data:", { ticketID, title, description, priority , department });
 
       fetch("/add-ticket", {
         method: "POST",
@@ -31,12 +35,14 @@ document.addEventListener("DOMContentLoaded", function() {
             ticketID,
             title,
             description,
-            priority
+            priority,
+            department,
+            assignedto
         })
       }).then(function (res) {
         if (res.ok) {
           console.log("data sent");
-          updateTableRow(ticketID, title, description, priority);
+          updateTableRow(ticketID, title, description, priority , department);
         } else {
           throw new Error("Network response was not ok");
         }
@@ -49,20 +55,23 @@ document.addEventListener("DOMContentLoaded", function() {
       titleInput.value = '';
       desc.value = '';
       priorityInput.value = 'high';
+      departmentInput.value = 'Software';
   });
 
-  function updateTableRow(ticketID, title, description, priority) {
+  function updateTableRow(ticketID, title, description, priority , department) {
       if (!currentRow) {
           currentRow = table.insertRow(-1);
           currentRow.insertCell(0);
           currentRow.insertCell(1);
           currentRow.insertCell(2);
           currentRow.insertCell(3);
+          currentRow.insertCell(4);
       }
 
       currentRow.cells[0].innerHTML = ticketID;
       currentRow.cells[1].innerHTML = title;
       currentRow.cells[2].innerHTML = description;
       currentRow.cells[3].innerHTML = priority;
+      currentRow.cells[4].innerHTML = department;
   }
 });

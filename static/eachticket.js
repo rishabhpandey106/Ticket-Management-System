@@ -21,8 +21,18 @@ function updateTicketDetails(details) {
     ticketPriority.innerText = `Priority: ${details.priority}`;
 }
 
+function updateEmployeeDetails(details) {
+    const eName = document.getElementById("e-name");
+    const eExpertise = document.getElementById("e-expertise");
+
+    eName.innerText = details.name;
+    eExpertise.innerText = `Expertise: ${details.expertise}`;
+}
+
 // Fetch and update ticket details on page load
 document.addEventListener("DOMContentLoaded", async () => {
     const ticketDetails = await fetchTicketDetails(ticketID);
-    updateTicketDetails(ticketDetails);
+    const { ticket, employee } = ticketDetails;
+    updateTicketDetails(ticket);
+    updateEmployeeDetails(employee);
 });
