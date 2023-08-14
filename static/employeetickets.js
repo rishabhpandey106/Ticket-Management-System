@@ -2,7 +2,6 @@ const ticketContainer = document.getElementById('ticket-container');
 
 function showTicket(ticket)
 {
-    
     const ticketElement = document.createElement('div');
     ticketElement.classList.add('ticket');
     
@@ -36,12 +35,12 @@ function showTicket(ticket)
     singleTicket.forEach(oneticket => {
         oneticket.addEventListener("click" , ()=> {
             const ticketID = oneticket.querySelector(".ticket-id").textContent;
-            window.location.href = `/ticket?id=${ticketID}`;
+            window.location.href = `/empticket?id=${ticketID}`;
         });
     })
 }
 
-fetch('/get-tickets')
+fetch('/get-emp-tickets')
     .then(response => response.json())
     .then(tickets => {
         tickets.forEach(ticket => {

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket Details</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <div class="navbar">
@@ -32,18 +33,18 @@
         <hr>
         <div class="chat-section">
             <h3>Chat</h3>
-            <div class="chat-messages">
-                <div class="message">
+            <div id="chat-messages" class="chat-messages">
+                <!-- <div class="message">
                     <span class="sender">John Doe:</span> Hi, how can I assist you?
-                </div>
-                <div class="message">
+                </div> -->
+                <!-- <div class="message">
                     <span class="sender">User:</span> I'm having trouble with my account.
-                </div>
-                <!-- More chat messages here -->
+                </div> -->
+
             </div>
             <div class="input-box">
-                <input type="text" placeholder="Type your message...">
-                <button class="send-button">Send</button>
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button id="send-button" class="send-button">Send</button>
             </div>
         </div>
         <script src="/static/eachticket.js"></script>
