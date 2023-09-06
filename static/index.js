@@ -24,6 +24,8 @@ document.addEventListener("DOMContentLoaded", function() {
       const department = departmentInput.value;
       console.log("departent"  , department); // low
       const assignedto = '';
+      const email = '';
+      const status = 'open';
       console.log("Submitting data:", { ticketID, title, description, priority , department });
 
       fetch("/add-ticket", {
@@ -37,7 +39,9 @@ document.addEventListener("DOMContentLoaded", function() {
             description,
             priority,
             department,
-            assignedto
+            assignedto,
+            email,
+            status
         })
       }).then(function (res) {
         if (res.ok) {

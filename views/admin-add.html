@@ -1,0 +1,217 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex: 1;
+            min-height: 230px;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: rgba(51 , 51 , 51 , 0.4) 0px 0px 0px 2px, rgba(51 , 51 , 51 , 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+            background-color: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .left-section {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #ccc;
+            max-width: 25%;
+            background-color: #f0f0f0;
+            overflow-y: auto;
+        }
+
+        .left-section h2 {
+            margin-top: 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        a:hover {
+            color: #007bff;
+        }
+
+        .graph {
+            flex: 1;
+            padding: 20px;
+            background-color: #f0f0f0;
+            max-width: 75%;
+        }
+
+        .tickets {
+            width: 800px;
+            flex: 3;
+            padding: 20px;
+        }
+
+        .tickets h2 {
+            margin-top: 0;
+        }
+
+        ul.ticket-list {
+            /* list-style: none;
+            padding: 0; */
+            max-width: 800px;
+            margin: auto;
+            padding: 2rem;
+        }
+
+        li.ticket-item {
+            /* margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fff; */
+            max-width: 800px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .ticket-description {
+            margin-bottom: 1rem;
+        }
+
+        .ticket-priority {
+            color: #333;
+        }
+
+        li.ticket-item {
+            position: relative;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            transition: filter 0.3s ease-in-out;
+        }
+
+        li.ticket-item:hover {
+            filter: brightness(80%);
+        }
+
+        li.ticket-item .ticket-id {
+            display: none;
+        }
+
+        li.ticket-item hr {
+            display: none;
+        }
+
+        li.ticket-item:hover hr {
+            display: block;
+        }
+
+        li.ticket-item:hover .ticket-id {
+            display: block;
+            font-weight: bold;
+        }
+        .search-container{
+            padding-top: 10px;
+        }
+        .filters{
+            padding-top: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Tickets Dashboard</h1>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="left-section">
+            <h2>Employee List:</h2>
+            <ul id="employeeList">
+                <!-- Employee names will be added here dynamically -->
+            </ul>
+        </div>
+
+        <div class="graph">
+            <h1>graph</h1>
+            <canvas id="ticketChart" width="400" height="200"></canvas>
+            <!-- Graph content will be added here -->
+        </div>
+    </div>
+
+    <div class="filters">
+        <label for="priority-filter">Priority:</label>
+        <select id="priority-filter">
+            <option value="all">All</option>
+            <option value="high">High</option>
+            <option value="medium">Mid</option>
+            <option value="low">Low</option>
+        </select>
+    
+        <label for="status-filter">Status:</label>
+        <select id="status-filter">
+            <option value="all">All</option>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+        </select>
+    </div>
+    
+    <div class="search-container">
+        <label for="ticket-search">Search by Title:</label>
+        <input type="text" id="ticket-search" placeholder="Search...">
+    </div>
+    
+
+    <div class="tickets">
+        <h2>Assigned Tickets:</h2>
+        <ul class="ticket-list" id="ticketList">
+            <!-- Assigned tickets will be added here dynamically -->
+        </ul>
+    </div>
+
+    <script src="/static/admin-add.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</body>
+</html>

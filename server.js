@@ -3,13 +3,35 @@ const path = require("path");
 const app = express();
 const session = require("express-session");
 const db = require("./models/db");
+const clientmodel = require("./models/client");
 const ticketmodel = require("./models/tickets");
 const employeemodel = require("./models/employee");
+const msgmodel = require("./models/messages");
 const http = require("http");
 const socketIO = require("socket.io");
 
+// const multer = require("multer");
+// const upload = multer({ dest: "uploads/" });
+const multer = require("multer");
+
+const multerstorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "uploads/");
+    },
+    filename: function (req, file, cb) {
+        const fileExtension = file.originalname.split(".").pop();
+        const uniqueFileName = Date.now() + "-" + file.fieldname + "." + fileExtension;
+        cb(null, uniqueFileName);
+    },
+});
+
+const upload = multer({ storage : multerstorage });
+// app.use(upload.single("ticket-chat-img"));
+
+
 // app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static("static"));
+app.use('/uploads', express.static('uploads'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
@@ -22,6 +44,11 @@ app.use(session({
 
 app.get("/", function (req, res) {
     // employeemodel.create({eID : "5734" , email : "shivam@ticket.com" , name: "shivam" , expertise: "hardware" , assigned: 25});
+    // ticketmodel.create({ticketID: "1234" , title: "title" , description:"desc" , priority: "high" , department: "software" , assignedto: "2473" , email: "title@gmail.com"});
+    if(!req.session.isloggedin)
+    {
+        res.sendFile(path.join(__dirname, "views/login.html"));
+    }
     res.sendFile(path.join(__dirname, "views/index.html"));
 });
 
@@ -35,7 +62,7 @@ app.post("/emp-login-data" , async function(req , res) {
         return;
     }
     
-    req.session.isloggedin = true;
+    req.session.isemploggedin = true;
     req.session.email = email;
     res.redirect("/et");
     // myfun.checkcred({email , password} , function(err , isvalid) {
@@ -63,9 +90,43 @@ app.post("/emp-login-data" , async function(req , res) {
     // });
 });
 
+app.post("/client-login-data" , async function(req , res) {
+    const { email, password } = req.body;
+
+    const clientcred = await ticketmodel.find({email : email});
+    if(!clientcred){
+        console.log("No suitable client found to assign the email.");
+        res.status(500).send("error");
+        return;
+    }
+
+    req.session.isloggedin = true;
+    req.session.email = email;
+    res.redirect("/");
+})
+
+app.post("/delete-ticket" , async function(req , res) {
+    console.log("serevr side delete" , req.body);
+    const { ticketID } = req.body;
+    const deleted = await ticketmodel.findOne({ticketID: ticketID});
+    console.log("server side - " , deleted);
+    const {status} = deleted;
+    // deleted.status = 'close';
+    // await deleted.save();
+    // res.redirect("/tickets");
+
+    if (deleted) {
+        deleted.status = 'close';
+        await deleted.save();
+        res.json({ message: "Ticket deleted successfully" });
+    } else {
+        res.status(404).json({ message: "Ticket not found" });
+    }
+});
+
 
 app.post("/add-ticket", async function (req, res) {
-    const {ticketID, title, description, priority , department , assignedto } = req.body;
+    const {ticketID, title, description, priority , department , assignedto , email , status} = req.body;
     console.log("Received data:", req.body);
     try
     {
@@ -87,7 +148,9 @@ app.post("/add-ticket", async function (req, res) {
         description,
         priority,
         department,
-        assignedto: employee.eID
+        assignedto: employee.eID,
+        email: req.session.email,
+        status
     };
     console.log(newTicketData);
     await ticketmodel.create(newTicketData);
@@ -109,44 +172,45 @@ app.post("/add-ticket", async function (req, res) {
     //     });
 });
 
-app.post("/add-ticket", async function (req, res) {
-    const { ticketID, title, description, priority, department } = req.body;
+// app.post("/add-ticket", async function (req, res) {
+//     const { ticketID, title, description, priority, department, status } = req.body;
 
-    // Find an employee with expertise in the given department
-    const employee = await Employee.findOne({ expertise: department, assigned: { $gt: 0 } })
-                                    .sort({ assigned: 1 });
+//     // Find an employee with expertise in the given department
+//     const employee = await Employee.findOne({ expertise: department, assigned: { $gt: 0 } })
+//                                     .sort({ assigned: 1 });
 
-    if (!employee) {
-        console.log("No suitable employee found to assign the ticket.");
-        res.status(500).send("error");
-        return;
-    }
+//     if (!employee) {
+//         console.log("No suitable employee found to assign the ticket.");
+//         res.status(500).send("error");
+//         return;
+//     }
 
-    // Decrement the assigned count of the assigned employee
-    employee.assigned--;
-    await employee.save();
+//     // Decrement the assigned count of the assigned employee
+//     employee.assigned--;
+//     await employee.save();
 
-    // Create a new ticket instance
-    const newTicket = new Ticket({
-        ticketID,
-        title,
-        description,
-        priority,
-        department,
-        assignedto: employee.eid
-    });
+//     // Create a new ticket instance
+//     const newTicket = new Ticket({
+//         ticketID,
+//         title,
+//         description,
+//         priority,
+//         department,
+//         assignedto: employee.eid,
+//         status
+//     });
 
-    try {
-        // Save the new ticket to the database
-        await newTicket.save();
+//     try {
+//         // Save the new ticket to the database
+//         await newTicket.save();
 
-        console.log("Data saved successfully");
-        res.status(200).send("success");
-    } catch (error) {
-        console.error("Error saving data:", error);
-        res.status(500).send("error");
-    }
-});
+//         console.log("Data saved successfully");
+//         res.status(200).send("success");
+//     } catch (error) {
+//         console.error("Error saving data:", error);
+//         res.status(500).send("error");
+//     }
+// });
 
 
 app.get("/each-ticket/:id", async function (req, res) {
@@ -168,9 +232,12 @@ app.get("/each-ticket/:id", async function (req, res) {
             return;
         }
 
+        const auth = req.session.email;
+
         const ticketAndEmployeeDetails = {
             ticket,
-            employee
+            employee,
+            auth
         };
 
         res.status(200).json(ticketAndEmployeeDetails);
@@ -188,7 +255,13 @@ app.get("/each-ticket/:id", async function (req, res) {
 });
 
 app.get('/tickets', function(req, res) {
-    res.sendFile(__dirname + '/views/tickets.html');
+    if (req.session.isemploggedin) {
+        res.sendFile(__dirname + '/views/tickets.html');
+    } else if (req.session.isloggedin) {
+        res.sendFile(__dirname + '/views/tickets.html');
+    } else {
+        res.sendFile(path.join(__dirname, "views/login.html"));
+    }
 });
 
 app.get('/employee', function(req, res) {
@@ -197,7 +270,7 @@ app.get('/employee', function(req, res) {
 
 app.get('/get-tickets', async function(req, res) {
     try {
-        const tickets = await ticketmodel.find();
+        const tickets = await ticketmodel.find({email: req.session.email});
         res.status(200).json(tickets);
     } catch (err) {
         res.status(500).json({ error: 'Error fetching tasks' });
@@ -226,13 +299,29 @@ app.get("/static/eachticket.js" , function(req , res){
     res.sendFile(__dirname + "/static/eachticket.js");
 }) 
 
+app.get("/static/admin-add.js" , function(req , res){
+    res.sendFile(__dirname + "/static/admin-add.js");
+})
+
 app.get("/ticket", function (req, res) {
+    if(!req.session.isloggedin)
+    {
+        res.sendFile(path.join(__dirname, "views/login.html"));
+    }
     res.sendFile(__dirname + "/views/eachticket.html");
 });
 
 app.get("/empticket", function (req, res) {
+    if(!req.session.isemploggedin)
+    {
+        res.sendFile(path.join(__dirname, "views/emp-login.html"));
+    }
     res.sendFile(__dirname + "/views/eachticket.html");
 });
+
+app.get("/admin" , function(req, res) {
+    res.sendFile(__dirname + "/views/admin-add.html");
+})
 
 app.get("/et" , function(req, res) {
     res.sendFile(__dirname + "/views/employeetickets.html");
@@ -250,6 +339,36 @@ app.get("/styles.css" , function(req, res) {
     res.sendFile(__dirname + "/views/styles.css");
 })
 
+app.get('/get-employees', async (req, res) => {
+    try {
+        const employees = await employeemodel.find();
+        res.json(employees);
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching employees' });
+    }
+});
+
+app.get('/get-alltickets', async (req, res) => {
+    const employeeId = req.query.employeeId;
+
+    try {
+        const tickets = await ticketmodel.find({ assignedto: employeeId });
+        res.json(tickets);
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching tickets' });
+    }
+});
+
+app.get("/graph-data", async (req, res) => {
+    try {
+        const tickets = await ticketmodel.find();
+        res.json(tickets);
+    } catch (error) {
+        console.error("Error fetching ticket data:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 // db.init().then(function () {
 //     console.log("database connected");
 //     app.listen(3000 , function () {
@@ -258,6 +377,7 @@ app.get("/styles.css" , function(req, res) {
 // }).catch(function(error) {
 //     console.log(error);
 // });
+
 db.init()
     .then(function () {
         console.log("database connected");
@@ -268,8 +388,72 @@ db.init()
         });
 
         // Initialize Socket.IO
-        const io = require("socket.io")(server);
+        app.post("/upload", upload.single("file"), async (req, res) => {
+            // Handle the uploaded file in req.file
+            // You can save it to a directory or process it further
+            const sender = req.body.sender;
+            const messageContent = req.body.message;
+            const room = req.body.room;
+            const uploadedFile = req.file?req.file:null;
 
+            console.log(req.body , "--" , sender , messageContent , uploadedFile , room)
+            const message = {
+                sender: sender,
+                content: messageContent,
+                file: uploadedFile,
+                url: uploadedFile?`uploads/${uploadedFile.filename}`:null  
+            };
+            
+            if(message.file)
+            {
+                const msgs = {
+                    sender: message.sender,
+                    messageContent: message.url, // Assuming you store the content here
+                    ticketID: room,
+                    timestamp: new Date() // You can customize the timestamp logic
+                };
+                try {
+                    await msgmodel.create(msgs);
+                    console.log("Message saved to the database");
+                } catch (error) {
+                    console.error("Error saving message to the database:", error);
+                }
+            }
+            else
+            {
+                const msgs = {
+                    sender: message.sender,
+                    messageContent: message.content, // Assuming you store the content here
+                    ticketID: room,
+                    timestamp: new Date() // You can customize the timestamp logic
+                };
+                try {
+                    await msgmodel.create(msgs);
+                    console.log("Message saved to the database");
+                } catch (error) {
+                    console.error("Error saving message to the database:", error);
+                }
+            }
+
+            io.to(room).emit("chat-message", message.sender, message);
+        
+            // res.json({ message: "File uploaded successfully" });
+        });
+
+        app.get("/chat-history/:ticketID", async (req, res) => {
+            const room = req.params.ticketID;
+            try {
+                const chatHistory = await msgmodel.find({ ticketID: room}).sort({ timestamp: 1 });
+                res.json(chatHistory);
+            } catch (error) {
+                console.error("Error fetching chat history:", error);
+                res.status(500).json({ error: "Internal Server Error" });
+            }
+        });
+        
+
+        const io = require("socket.io")(server);
+        
         io.on("connection", (socket) => {
             console.log("A user connected" , socket.id);
 
@@ -277,11 +461,60 @@ db.init()
                 socket.join(room); // Join the specified room
             });
 
-            socket.on("chat-message", (room, message) => {
+            socket.on("chat-message", async (room, message) => {
                 // Emit the message to only the participants in the room
                 console.log(socket.id , ":" , message);
-                io.to(room).emit("chat-message", message.sender , message.content);
+                
+                // if (message.file) {
+                //     // Handle file upload using Multer
+                //     const uploadedFile = await handleFileUpload(message.file);
+                //     // const dataUrl = createDataUrlFromBuffer(uploadedFile.buffer);
+                //     const fileMessage = {
+                //         type: "file",
+                //         url: `/uploads/${uploadedFile.filename}`
+                //     };
+                //     // message.file = uploadedFile.filename;             
+    
+                //     io.to(room).emit("chat-message", message.sender , fileMessage.url);
+                // }
+                // else
+                // {
+                //     io.to(room).emit("chat-message", message.sender, { text: message.content });
+                // }
+
+                if(message.file)
+                {
+                    const fileMessage = {
+                                type: "file",
+                                url: `uploads/${message.file.filename}`
+                            };
+
+                    io.to(room).emit("chat-message", message.sender, fileMessage );
+                }                   
+                else
+                {
+                    io.to(room).emit("chat-message", message.sender, message.content );
+                }
+                    
+                socket.broadcast.to(room).emit("notification", "New message received");
             });
+
+            // async function handleFileUpload(file) {
+            //     // Define a promise-based version of the multer's upload function
+            //     return new Promise((resolve, reject) => {
+            //         upload.single("file")(file, null, async function (err) {
+            //             if (err) {
+            //                 reject(err);
+            //             } else {
+            //                 resolve(file);
+            //             }
+            //         });
+            //     });
+            // }
+
+            // function createDataUrlFromBuffer(buffer) {
+            //     return buffer.toString("base64");
+            // }
 
             socket.on("disconnect", () => {
                 console.log("A user disconnected");

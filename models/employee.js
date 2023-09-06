@@ -5,7 +5,8 @@ const employeeschema = new mongoose.Schema({
     email: String,
     name : String,
     expertise : String,
-    assigned : Number
+    assigned : Number,
+    password : String
 });
 
 const employee = mongoose.model("employee" , employeeschema);

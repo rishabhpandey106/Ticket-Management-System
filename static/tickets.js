@@ -31,6 +31,16 @@ function showTicket(ticket)
     ticketElement.appendChild(priorityElement);
     
     ticketContainer.appendChild(ticketElement);
+    if(ticket.status == "close")
+    {
+        ticketElement.style.backgroundColor = "#adb5bd";
+        // const ticketFlag = document.createElement("span");
+        // ticketFlag.classList.add("ticket-flag")
+        // ticketFlag.innerText = "Resolved"
+        // ticketFlag.style.color="#212529"
+        // ticketidelement.appendChild(ticketFlag)
+    }
+        
 
     const singleTicket = document.querySelectorAll('.ticket');
     singleTicket.forEach(oneticket => {
