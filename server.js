@@ -55,16 +55,18 @@ app.get("/", function (req, res) {
 app.post("/emp-login-data" , async function(req , res) {
     const { email, password } = req.body;
 
-    const empcred = await employeemodel.findOne({email : email});
+    const empcred = await employeemodel.findOne({email : email , password : password});
     if(!empcred){
         console.log("No suitable employee found to assign the email.");
         res.status(500).send("error");
         return;
     }
-    
-    req.session.isemploggedin = true;
-    req.session.email = email;
-    res.redirect("/et");
+    else
+    {
+        req.session.isemploggedin = true;
+        req.session.email = email;
+        res.redirect("/et");
+    }
     // myfun.checkcred({email , password} , function(err , isvalid) {
     //     if(err) {
     //         res.status(500).send("error");
@@ -93,16 +95,64 @@ app.post("/emp-login-data" , async function(req , res) {
 app.post("/client-login-data" , async function(req , res) {
     const { email, password } = req.body;
 
-    const clientcred = await ticketmodel.find({email : email});
+    const clientcred = await clientmodel.findOne({email : email});
     if(!clientcred){
         console.log("No suitable client found to assign the email.");
         res.status(500).send("error");
         return;
+    }else{
+        req.session.isloggedin = true;
+        req.session.email = email;
+        res.redirect("/");
+    }
+})
+
+app.post("/client-signup-data" , async function(req , res) {
+    const {email , password} = req.body;
+    try{
+        await clientmodel.create({email , password});
+        console.log("Data saved successfully");
+        res.redirect("/");
+    } catch (error) {
+        console.error("Error saving data:", error);
+        res.status(500).send("error");
+    }
+})
+app.get("/logout" , function(req , res) {
+    req.session.isloggedin = false;
+    req.session.isemploggedin = false;
+    res.redirect("/");
+})
+
+app.get("/add-anyone" , function(req , res){
+    res.sendFile(__dirname + "/views/add-emp.html")
+})
+
+app.get("/static/add-emp.js" , function(req , res){
+    res.sendFile(__dirname + "/static/add-emp.js")
+})
+
+app.post("/employee-cred" , async function(req , res){
+    const {eID , email , name , expertise , password} = req.body;
+    console.log(req.body);
+    const assigned = 25;
+    try
+    {
+        await employeemodel.create({
+            eID,
+            email,
+            name,
+            expertise,
+            assigned: 25,
+            password
+        });
+        console.log("data saved");
+    }
+    catch{
+        console.error("error : ",error);
+        res.static(500).send("error");
     }
 
-    req.session.isloggedin = true;
-    req.session.email = email;
-    res.redirect("/");
 })
 
 app.post("/delete-ticket" , async function(req , res) {
@@ -338,6 +388,10 @@ app.get("/static/index.js" , function(req , res){
 app.get("/styles.css" , function(req, res) {
     res.sendFile(__dirname + "/views/styles.css");
 })
+
+app.get("/signup" , function(req , res) {
+    res.sendFile(__dirname + "/views/signup.html")
+});
 
 app.get('/get-employees', async (req, res) => {
     try {
