@@ -11,20 +11,9 @@
             font-family: Arial, sans-serif;
             /* background-color: #f0f0f0; */
             background-image: url("https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
-            
         }
 
         .login-container {
-            background-color: #ffffff;
-            max-width: 400px;
-            margin: 69px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-        .extra
-        {
             background-color: #ffffff;
             max-width: 400px;
             margin: 100px auto;
@@ -32,15 +21,6 @@
             border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
             text-align: center;
-        }
-        a{
-            text-decoration: none;
-            color: #007bff;
-            box-shadow: 0px 0px 10px rgba(81, 103, 217, 0.748);
-        }
-        a:hover{
-            background-color: #cec4c4;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.748);
         }
 
         h1 {
@@ -86,24 +66,13 @@
 <body>
     <div class="login-container">
         <h1>Login</h1>
-        <form action="/client-login-data" id="login-form" method="post">
+        <form action="/admin-login-data" id="login-form" method="post">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
             <button type="submit">Login</button>
-            <!-- <hr>
-            <a href="/signup">Sign Up</a>
-            <hr>
-            <a href="/employee">Employee Login</a> -->
         </form>
-    </div>
-    <div class="extra">
-        <a href="/signup">Sign Up</a>
-        <hr>
-        <a href="/employee">Employee Login</a>
-        <hr>
-        <a href="/admin-login">Admin Login</a>
     </div>
 </body>
 </html>

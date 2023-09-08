@@ -6,9 +6,11 @@ const db = require("./models/db");
 const clientmodel = require("./models/client");
 const ticketmodel = require("./models/tickets");
 const employeemodel = require("./models/employee");
+const adminmodel = require("./models/admin")
 const msgmodel = require("./models/messages");
 const http = require("http");
 const socketIO = require("socket.io");
+const nodemailer = require('nodemailer');
 
 // const multer = require("multer");
 // const upload = multer({ dest: "uploads/" });
@@ -47,10 +49,14 @@ app.get("/", function (req, res) {
     // ticketmodel.create({ticketID: "1234" , title: "title" , description:"desc" , priority: "high" , department: "software" , assignedto: "2473" , email: "title@gmail.com"});
     if(!req.session.isloggedin)
     {
-        res.sendFile(path.join(__dirname, "views/login.html"));
+        res.redirect("/login");
     }
     res.sendFile(path.join(__dirname, "views/index.html"));
 });
+
+app.get("/login" , function(req , res){
+    res.sendFile(path.join(__dirname, "views/login.html"));
+})
 
 app.post("/emp-login-data" , async function(req , res) {
     const { email, password } = req.body;
@@ -95,7 +101,7 @@ app.post("/emp-login-data" , async function(req , res) {
 app.post("/client-login-data" , async function(req , res) {
     const { email, password } = req.body;
 
-    const clientcred = await clientmodel.findOne({email : email});
+    const clientcred = await clientmodel.findOne({email : email , password : password});
     if(!clientcred){
         console.log("No suitable client found to assign the email.");
         res.status(500).send("error");
@@ -105,6 +111,25 @@ app.post("/client-login-data" , async function(req , res) {
         req.session.email = email;
         res.redirect("/");
     }
+})
+
+app.post("/admin-login-data" , async function(req , res) {
+    const { email, password } = req.body;
+
+    const admincred = await adminmodel.findOne({email : email , password : password});
+    if(!admincred){
+        console.log("No suitable admin found to assign the email.");
+        res.status(500).send("error");
+        return;
+    }else{
+        req.session.isadminloggedin = true;
+        req.session.email = email;
+        res.redirect("/admin");
+    }
+})
+
+app.get("/admin-login" , function(req , res){
+    res.sendFile(__dirname + "/views/admin-login.html")
 })
 
 app.post("/client-signup-data" , async function(req , res) {
@@ -121,7 +146,7 @@ app.post("/client-signup-data" , async function(req , res) {
 app.get("/logout" , function(req , res) {
     req.session.isloggedin = false;
     req.session.isemploggedin = false;
-    res.redirect("/");
+    res.redirect("/login");
 })
 
 app.get("/add-anyone" , function(req , res){
@@ -147,12 +172,67 @@ app.post("/employee-cred" , async function(req , res){
             password
         });
         console.log("data saved");
+        sendEmail(email, password);
+        res.redirect("/add-anyone");
     }
     catch{
         console.error("error : ",error);
         res.static(500).send("error");
     }
 
+})
+
+function sendEmail(to, password) {
+    const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        port: 465,
+        secure: true,
+        logger: true,
+        debug: true,
+        secureConnection: false,
+        auth: {
+            user: 'herokanon39@gmail.com',
+            pass: '**********',
+        },
+        tls: {
+            rejectUnauthorized: true
+        }
+    });
+
+    const mailOptions = {
+        from: 'herokanon39@gmail.com',
+        to,
+        subject: 'Employee Registration',
+        text: `Your registration was successful. Your login credentials are:\nEmail: ${to}\nPassword: ${password}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+}
+
+app.post("/admin-cred" , async function(req , res) {
+    const {adminid , name , email , password} = req.body;
+    console.log(req.body);
+    try
+    {
+        await adminmodel.create({
+            adminid,
+            name,
+            email,
+            password
+        });
+        console.log("data saved");
+        res.redirect("/add-anyone");
+    }
+    catch
+    {
+        console.error("error: ",error);
+    }
 })
 
 app.post("/delete-ticket" , async function(req , res) {
