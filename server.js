@@ -173,26 +173,27 @@ app.post("/employee-cred" , async function(req , res){
         });
         console.log("data saved");
         sendEmail(email, password);
-        res.redirect("/add-anyone");
+        res.redirect("/add-anyone?success=true");
     }
     catch{
-        console.error("error : ",error);
+        // console.error("error : ",error);
         res.static(500).send("error");
     }
 
 })
 
 function sendEmail(to, password) {
+
     const transporter = nodemailer.createTransport({
-        service: 'Gmail',
+        service: 'gmail',
         port: 465,
         secure: true,
         logger: true,
         debug: true,
         secureConnection: false,
         auth: {
-            user: 'herokanon39@gmail.com',
-            pass: '**********',
+            user: 'rishabhpandey230@gmail.com',
+            pass: '******',
         },
         tls: {
             rejectUnauthorized: true
@@ -200,7 +201,7 @@ function sendEmail(to, password) {
     });
 
     const mailOptions = {
-        from: 'herokanon39@gmail.com',
+        from: 'rishabhpandey230@gmail.com',
         to,
         subject: 'Employee Registration',
         text: `Your registration was successful. Your login credentials are:\nEmail: ${to}\nPassword: ${password}`,
@@ -214,6 +215,7 @@ function sendEmail(to, password) {
         }
     });
 }
+
 
 app.post("/admin-cred" , async function(req , res) {
     const {adminid , name , email , password} = req.body;
