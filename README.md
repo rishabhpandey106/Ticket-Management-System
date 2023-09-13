@@ -18,7 +18,7 @@
 
 The Ticket Management System is a web-based application designed to streamline and automate the process of managing tickets, issues, or tasks within an organization or project. It provides a user-friendly interface for creating, updating, and tracking tickets, making it easier for teams to collaborate and resolve issues efficiently.
 
-![Screenshot](screenshot.png)
+![Screenshot](https://github.com/rishabhpandey106/Ticket-Management-System/blob/master/assets/image1.png?raw=true)
 
 ## Features
 
