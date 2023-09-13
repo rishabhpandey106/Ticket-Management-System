@@ -11,6 +11,7 @@ const msgmodel = require("./models/messages");
 const http = require("http");
 const socketIO = require("socket.io");
 const nodemailer = require('nodemailer');
+const myfun = require("./routes/routesFunction");
 
 // const multer = require("multer");
 // const upload = multer({ dest: "uploads/" });
@@ -172,7 +173,8 @@ app.post("/employee-cred" , async function(req , res){
             password
         });
         console.log("data saved");
-        sendEmail(email, password);
+        // sendEmail(email, password);
+        myfun.sendEmail(email,password);
         res.redirect("/add-anyone?success=true");
     }
     catch{
@@ -182,39 +184,39 @@ app.post("/employee-cred" , async function(req , res){
 
 })
 
-function sendEmail(to, password) {
+// function sendEmail(to, password) {
 
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        port: 465,
-        secure: true,
-        logger: true,
-        debug: true,
-        secureConnection: false,
-        auth: {
-            user: 'rishabhpandey230@gmail.com',
-            pass: '******',
-        },
-        tls: {
-            rejectUnauthorized: true
-        }
-    });
+//     const transporter = nodemailer.createTransport({
+//         service: 'gmail',
+//         port: 465,
+//         secure: true,
+//         logger: true,
+//         debug: true,
+//         secureConnection: false,
+//         auth: {
+//             user: 'rishabhpandey230@gmail.com',
+//             pass: '******',
+//         },
+//         tls: {
+//             rejectUnauthorized: true
+//         }
+//     });
 
-    const mailOptions = {
-        from: 'rishabhpandey230@gmail.com',
-        to,
-        subject: 'Employee Registration',
-        text: `Your registration was successful. Your login credentials are:\nEmail: ${to}\nPassword: ${password}`,
-    };
+//     const mailOptions = {
+//         from: 'rishabhpandey230@gmail.com',
+//         to,
+//         subject: 'Employee Registration',
+//         text: `Your registration was successful. Your login credentials are:\nEmail: ${to}\nPassword: ${password}`,
+//     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
-}
+//     transporter.sendMail(mailOptions, (error, info) => {
+//         if (error) {
+//             console.error(error);
+//         } else {
+//             console.log('Email sent: ' + info.response);
+//         }
+//     });
+// }
 
 
 app.post("/admin-cred" , async function(req , res) {
