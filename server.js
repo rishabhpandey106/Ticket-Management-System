@@ -45,7 +45,6 @@ app.use(session({
     saveUninitialized: true
 }));
 
-
 app.get("/", function (req, res) {
     // employeemodel.create({eID : "5734" , email : "shivam@ticket.com" , name: "shivam" , expertise: "hardware" , assigned: 25});
     // ticketmodel.create({ticketID: "1234" , title: "title" , description:"desc" , priority: "high" , department: "software" , assignedto: "2473" , email: "title@gmail.com"});
