@@ -106,4 +106,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Special thanks to [contributors](https://github.com/rishabhpandey106/Ticket-Management-System/graphs/contributors) for their contributions to this project.
 - This project was inspired by the need for efficient issue tracking and management in various organizations.
 
-Feel free to customize this README to fit your project's specific details and requirements. Be sure to update the placeholders with actual information and provide clear instructions for users and contributors.
