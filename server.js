@@ -13,8 +13,9 @@ const socketIO = require("socket.io");
 const nodemailer = require('nodemailer');
 const myfun = require("./routes/routesFunction");
 
-// const multer = require("multer");
-// const upload = multer({ dest: "uploads/" });
+//-------------------------------------------------------------------------------------------------------//
+// all middlewares
+
 const multer = require("multer");
 
 const multerstorage = multer.diskStorage({
