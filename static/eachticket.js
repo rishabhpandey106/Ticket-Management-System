@@ -97,6 +97,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fileLink.style.maxWidth = "30%";
                 messageElement.appendChild(fileLink);
                 chatMessage.appendChild(messageElement);
+                fileLink.addEventListener("click", function (event) {
+                    event.preventDefault();
+                
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = message.messageContent;
+                
+                    // Extract the file extension from the URL
+                    const urlParts = message.messageContent.split(".");
+                    if (urlParts.length > 1) {
+                        const extension = urlParts[urlParts.length - 1];
+                        downloadLink.download = `downloaded_file.${extension}`;
+                    } else {
+                        downloadLink.download = "downloaded_file";
+                    }
+                
+                    downloadLink.click();
+                });
             }
             else
             {
@@ -200,12 +217,30 @@ document.addEventListener("DOMContentLoaded", async () => {
             messageElement.appendChild(fileLink);
             chatMessages.appendChild(messageElement);
             
-            fileLink.addEventListener("click" , function(req , res) {
+            // fileLink.addEventListener("click" , function(req , res) {
+            //     const downloadLink = document.createElement("a");
+            //     downloadLink.href = messageContent.url;
+            //     downloadLink.download = "downloaded_image.jpg"; 
+            //     downloadLink.click();
+            // })
+            fileLink.addEventListener("click", function (event) {
+                event.preventDefault();
+            
                 const downloadLink = document.createElement("a");
                 downloadLink.href = messageContent.url;
-                downloadLink.download = "downloaded_image.jpg"; 
+            
+                // Extract the file extension from the URL
+                const urlParts = messageContent.url.split(".");
+                if (urlParts.length > 1) {
+                    const extension = urlParts[urlParts.length - 1];
+                    downloadLink.download = `downloaded_file.${extension}`;
+                } else {
+                    downloadLink.download = "downloaded_file";
+                }
+            
                 downloadLink.click();
-            })
+            });
+            
             
         }  else {
             console.log(socket.id , sender , messageContent )
